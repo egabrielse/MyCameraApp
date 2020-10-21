@@ -13,8 +13,7 @@ Basic iOS camera app using UIKit and AVFoundation.
 - [ ] Add animations / improve ui design
 
 ## UI Showcase
-![UI as of 10/21/20](./MyCameraApp/PortfolioImages/ScreenShot(10:21:20).png = 250x)
-
+<img src="./MyCameraApp/PortfolioImages/ScreenShot(10:21:20).png" alt="UI as of 10/21/20" width="250"/>
 
 ## Sources
 - Button icons for flash-on, flash-off, and switch-camera are from icons8 (https://icons8.com)
