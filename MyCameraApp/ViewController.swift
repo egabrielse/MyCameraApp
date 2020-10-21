@@ -14,28 +14,36 @@ import AVFoundation
 class ViewController: UIViewController {
     let cameraController = CameraController();
     var images: [UIImage] = [];
-    
+        
     // MARK: viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.view.backgroundColor = .black;
         self.view.addSubview(self.captureButton);
         self.view.addSubview(self.imageView);
+        self.view.addSubview(self.switchCameraButton);
+        self.view.addSubview(self.toggleFlashButton);
 
         cameraController.prepare {(error) in
             if let error = error {
                 print(error)
             } else {
                 try? self.cameraController.displayPreview(on: self.view);
+                
+                let flashIcon = self.cameraController.getFlashMode();
+                self.toggleFlashButton.setImage(flashIcon, for: .normal);
             }
         }
-        
+
         NSLayoutConstraint.activate([
             self.captureButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             self.captureButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -25),
             self.imageView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -25),
-            self.imageView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 25)
+            self.imageView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 25),
+            self.switchCameraButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
+            self.switchCameraButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30),
+            self.toggleFlashButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
+            self.toggleFlashButton.bottomAnchor.constraint(equalTo: self.switchCameraButton.topAnchor, constant: -15),
         ])
     }
 
@@ -67,6 +75,28 @@ class ViewController: UIViewController {
         imgView.backgroundColor = .black;
         return imgView;
     }()
+    
+    
+    let switchCameraButton: UIButton = {
+        let btn = UIButton();
+        btn.translatesAutoresizingMaskIntoConstraints = false;
+        btn.widthAnchor.constraint(equalToConstant: 30).isActive = true;
+        btn.heightAnchor.constraint(equalToConstant: 30).isActive = true;
+        let btnImg = UIImage(named: "icons8-switch-camera-50");
+        btn.setImage(btnImg, for: .normal)
+        btn.addTarget(self, action: #selector(switchCamera), for: .touchUpInside);
+        return btn;
+    }()
+    
+    
+    let toggleFlashButton: UIButton = {
+        let btn = UIButton();
+        btn.translatesAutoresizingMaskIntoConstraints = false;
+        btn.widthAnchor.constraint(equalToConstant: 30).isActive = true;
+        btn.heightAnchor.constraint(equalToConstant: 30).isActive = true;
+        btn.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside);
+        return btn;
+    }()
 }
 
 
@@ -84,12 +114,25 @@ extension ViewController {
     
     // MARK: toggleFlash
     @objc func toggleFlash() {
-        
+        let flashIcon = cameraController.toggleFlashMode();
+        self.toggleFlashButton.setImage(flashIcon, for: .normal);
     }
     
     // MARK: switchCamera
     @objc func switchCamera() {
-        
+        if cameraController.selectedCamera == CameraController.CameraSelection.front {
+            do {
+                try cameraController.switchCameraToRear();
+            } catch {
+                print(error);
+            }
+        } else {
+            do {
+                try cameraController.switchCameraToFront();
+            } catch {
+                print(error);
+            }
+        }
     }
 }
 

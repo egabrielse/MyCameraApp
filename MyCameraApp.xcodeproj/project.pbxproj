@@ -14,7 +14,6 @@
 		02D7B8D1253F66D1008DF5C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02D7B8CF253F66D1008DF5C0 /* LaunchScreen.storyboard */; };
 		02D7B8DA253F6D1F008DF5C0 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D7B8D9253F6D1F008DF5C0 /* CameraController.swift */; };
 		02D7B90B25406FDB008DF5C0 /* PhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D7B90A25406FDB008DF5C0 /* PhotoCaptureDelegate.swift */; };
-		02D7B91125409F24008DF5C0 /* CameraErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D7B91025409F24008DF5C0 /* CameraErrors.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +26,7 @@
 		02D7B8D2253F66D1008DF5C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		02D7B8D9253F6D1F008DF5C0 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		02D7B90A25406FDB008DF5C0 /* PhotoCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureDelegate.swift; sourceTree = "<group>"; };
-		02D7B91025409F24008DF5C0 /* CameraErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraErrors.swift; sourceTree = "<group>"; };
+		02D7B9142540BBB5008DF5C0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +43,7 @@
 		02D7B8B8253F66CD008DF5C0 = {
 			isa = PBXGroup;
 			children = (
+				02D7B9142540BBB5008DF5C0 /* README.md */,
 				02D7B8C3253F66CD008DF5C0 /* MyCameraApp */,
 				02D7B8C2253F66CD008DF5C0 /* Products */,
 			);
@@ -65,7 +65,6 @@
 				02D7B8C8253F66CD008DF5C0 /* ViewController.swift */,
 				02D7B8D9253F6D1F008DF5C0 /* CameraController.swift */,
 				02D7B90A25406FDB008DF5C0 /* PhotoCaptureDelegate.swift */,
-				02D7B91025409F24008DF5C0 /* CameraErrors.swift */,
 				02D7B8CD253F66D1008DF5C0 /* Assets.xcassets */,
 				02D7B8CF253F66D1008DF5C0 /* LaunchScreen.storyboard */,
 				02D7B8D2253F66D1008DF5C0 /* Info.plist */,
@@ -145,7 +144,6 @@
 				02D7B90B25406FDB008DF5C0 /* PhotoCaptureDelegate.swift in Sources */,
 				02D7B8C9253F66CD008DF5C0 /* ViewController.swift in Sources */,
 				02D7B8C5253F66CD008DF5C0 /* AppDelegate.swift in Sources */,
-				02D7B91125409F24008DF5C0 /* CameraErrors.swift in Sources */,
 				02D7B8DA253F6D1F008DF5C0 /* CameraController.swift in Sources */,
 				02D7B8C7253F66CD008DF5C0 /* SceneDelegate.swift in Sources */,
 			);

@@ -18,16 +18,19 @@ class CameraController: NSObject{
     var captureSession: AVCaptureSession?
     /// Capture Devices:
     var frontCamera: AVCaptureDevice?
-    var backCamera: AVCaptureDevice?
+    var rearCamera: AVCaptureDevice?
     
     /// Inputs:
     var frontCameraInput: AVCaptureDeviceInput?
-    var backCameraInput: AVCaptureDeviceInput?
+    var rearCameraInput: AVCaptureDeviceInput?
     
     /// Output:
     var previewLayer: AVCaptureVideoPreviewLayer?
     var photoOutput: AVCapturePhotoOutput?
     
+    /// Settings:
+    var flashMode = AVCaptureDevice.FlashMode.off;
+    var selectedCamera: CameraSelection?;
     
     // MARK: prepare
     func prepare(completionHandler: @escaping (Error?) -> Void){
@@ -56,14 +59,14 @@ class CameraController: NSObject{
 
 
 /*
- MARK: Setup Functions
+ MARK: SETUP METHODS
  */
 extension CameraController {
     
     // MARK: createCaptureSession
     func createCaptureSession() throws {
         let semaphore = DispatchSemaphore(value: 0);
-        print("Creating capture session...")
+        print("\nCreating capture session...")
         switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .authorized: /// The user has previously granted access to the camera.
                 print("The user has previously granted access to the camera. Creating capture session.")
@@ -94,29 +97,31 @@ extension CameraController {
     
     // MARK: configureInputDevices
     func configureInputDevices() throws {
-        print("Configuring capture devices...")
+        print("\nConfiguring capture devices...")
         let frontCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .front);
         self.frontCamera = frontCamera;
-        let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back);
-        self.backCamera = backCamera;
+        let rearCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back);
+        self.rearCamera = rearCamera;
         print("Configured capture devices.")
     }
     
     
     // MARK: configureDeviceInputs
     func configureDeviceInputs() throws {
-        print("Configuring device inputs...")
+        print("\nConfiguring device inputs...")
         guard let captureSession = self.captureSession else { throw CameraControllerError.captureSessionIsMissing }
         
-        if let backCamera = self.backCamera, let frontCamera = self.frontCamera {
-            self.backCameraInput = try AVCaptureDeviceInput(device: backCamera);
+        if let rearCamera = self.rearCamera, let frontCamera = self.frontCamera {
+            self.rearCameraInput = try AVCaptureDeviceInput(device: rearCamera);
             self.frontCameraInput = try AVCaptureDeviceInput(device: frontCamera);
             
-            if captureSession.canAddInput(self.backCameraInput!) {
-                captureSession.addInput(self.backCameraInput!)
+            if captureSession.canAddInput(self.rearCameraInput!) {
+                captureSession.addInput(self.rearCameraInput!)
+                self.selectedCamera = CameraSelection.rear;
                 print("Configured camera to use rear-facing camera.")
             } else if captureSession.canAddInput(self.frontCameraInput!) {
                 captureSession.addInput(self.frontCameraInput!)
+                self.selectedCamera = CameraSelection.front;
                 print("Configured camera to use front-facing camera.")
             } else { throw CameraControllerError.inputsAreInvalid }
         } else { throw CameraControllerError.noCamerasAvailable }
@@ -125,7 +130,7 @@ extension CameraController {
     
     // MARK: configureDeviceOutput
     func configureDeviceOutput() throws {
-        print("Configuring device output...")
+        print("\nConfiguring device output...")
         guard let captureSession = self.captureSession else { throw CameraControllerError.captureSessionIsMissing }
         
         self.photoOutput = AVCapturePhotoOutput();
@@ -136,12 +141,19 @@ extension CameraController {
             captureSession.addOutput(self.photoOutput!);
         } else { throw CameraControllerError.unknown}
     }
-    
-    
+}
+
+
+
+
+/*
+ MARK: USAGE METHODS
+ */
+extension CameraController {
     
     // MARK: displayPreview
     func displayPreview(on view: UIView) throws {
-        print("Displaying preview...")
+        print("\nDisplaying preview...")
         guard let captureSession = self.captureSession, captureSession.isRunning else {
             throw CameraControllerError.captureSessionIsMissing
         }
@@ -157,8 +169,92 @@ extension CameraController {
     
     // MARK: capturePhoto
     func capturePhoto(delegate: AVCapturePhotoCaptureDelegate) {
-        print("Capturing photo...")
+        print("\nCapturing photo...")
         let settings = AVCapturePhotoSettings();
+        settings.flashMode = self.flashMode;
         self.photoOutput?.capturePhoto(with: settings, delegate: delegate);
+    }
+    
+    
+    // MARK: switchCameraToFront
+    func switchCameraToFront() throws {
+        print("\nSwitching device input from rear to front...")
+        guard let captureSession = self.captureSession else { throw CameraControllerError.captureSessionIsMissing }
+        
+        guard let rearCameraInput = self.rearCameraInput, captureSession.inputs.contains(rearCameraInput) else {
+            throw CameraControllerError.rearCaptureDeviceInputMissing;
+        }
+        
+        self.frontCameraInput = try AVCaptureDeviceInput(device: self.frontCamera!)
+        captureSession.removeInput(rearCameraInput)
+
+        if captureSession.canAddInput(self.frontCameraInput!) {
+            captureSession.addInput(self.frontCameraInput!)
+            self.selectedCamera = .front;
+            print("Switched device input to front.")
+        } else { throw CameraControllerError.invalidOperation }
+    }
+    
+    // MARK: switchCameraToRear
+    func switchCameraToRear() throws {
+        print("\nSwitching device input from front to rear...")
+        guard let captureSession = self.captureSession else { throw CameraControllerError.captureSessionIsMissing }
+        
+        guard let frontCameraInput = self.frontCameraInput, captureSession.inputs.contains(frontCameraInput) else {
+            throw CameraControllerError.frontCaptureDeviceInputMissing;
+        }
+        
+        self.rearCameraInput = try AVCaptureDeviceInput(device: self.rearCamera!)
+        captureSession.removeInput(frontCameraInput)
+
+        if captureSession.canAddInput(self.rearCameraInput!) {
+            captureSession.addInput(self.rearCameraInput!)
+            self.selectedCamera = .rear;
+            print("Switched device input to rear.")
+        } else { throw CameraControllerError.invalidOperation }
+    }
+    
+    
+    func toggleFlashMode() -> UIImage {
+        if self.flashMode == AVCaptureDevice.FlashMode.on {
+            print("\nFlash mode is now off.")
+            self.flashMode = AVCaptureDevice.FlashMode.off;
+            return UIImage(named: "icons8-flash-off-50")!;
+        } else {
+            self.flashMode = AVCaptureDevice.FlashMode.on;
+            print("\nFlash mode is now on.")
+            return UIImage(named: "icons8-flash-on-50")!;
+        }
+    }
+    
+    func getFlashMode() -> UIImage {
+        if self.flashMode == AVCaptureDevice.FlashMode.on {
+            return UIImage(named: "icons8-flash-on-50")!;
+        } else {
+            return UIImage(named: "icons8-flash-off-50")!;
+        }
+    }
+}
+
+
+
+
+extension CameraController {
+    enum CameraControllerError: Swift.Error {
+        case rearCaptureDeviceInputMissing
+        case frontCaptureDeviceInputMissing
+        case authorizationRestricted
+        case authorizationDenied
+        case captureSessionAlreadyRunning
+        case captureSessionIsMissing
+        case inputsAreInvalid
+        case invalidOperation
+        case noCamerasAvailable
+        case unknown
+    }
+    
+    enum CameraSelection {
+        case front
+        case rear
     }
 }
