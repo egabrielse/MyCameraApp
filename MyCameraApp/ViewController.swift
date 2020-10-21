@@ -68,10 +68,11 @@ class ViewController: UIViewController {
         let imgView = UIImageView();
         imgView.translatesAutoresizingMaskIntoConstraints = false;
         imgView.widthAnchor.constraint(equalToConstant: 50).isActive = true;
-        imgView.heightAnchor.constraint(equalToConstant: 75).isActive = true;
+        imgView.heightAnchor.constraint(equalToConstant: 80).isActive = true;
         imgView.layer.cornerRadius = 5;
         imgView.layer.borderWidth = 3;
         imgView.layer.borderColor = CGColor(red: 255, green: 255, blue: 255, alpha: 1.0);
+        imgView.layer.masksToBounds = true;
         imgView.backgroundColor = .black;
         return imgView;
     }()
@@ -146,16 +147,23 @@ extension ViewController {
 extension ViewController: AVCapturePhotoCaptureDelegate {
     // MARK: photoOutput
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        print("Handling photo capture output...")
         if let error = error {
             print(error);
             return;
         }
         
         guard let imageData = photo.fileDataRepresentation() else { return }
-        print("Photo captured.")
-        let img = UIImage(data: imageData)!
-        self.images.insert(img, at: 0);
+        let image = UIImage(data: imageData)!
+        if cameraController.selectedCamera == CameraController.CameraSelection.front {
+            let flippedImage = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
+            self.images.insert(flippedImage, at: 0);
+            print("Photo from front facing camera captured.")
+        } else {
+            print("Photo from rear facing camera captured.")
+            self.images.insert(image, at: 0)
+        }
         self.imageView.image = self.images[0];
+        
+        // TODO: Save image to Photos
     }
 }

@@ -14,6 +14,7 @@
 		02D7B8D1253F66D1008DF5C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02D7B8CF253F66D1008DF5C0 /* LaunchScreen.storyboard */; };
 		02D7B8DA253F6D1F008DF5C0 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D7B8D9253F6D1F008DF5C0 /* CameraController.swift */; };
 		02D7B90B25406FDB008DF5C0 /* PhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D7B90A25406FDB008DF5C0 /* PhotoCaptureDelegate.swift */; };
+		02D7B9182540E9F4008DF5C0 /* ScreenShot(10:21:20).png in Resources */ = {isa = PBXBuildFile; fileRef = 02D7B9172540E9F4008DF5C0 /* ScreenShot(10:21:20).png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		02D7B8D9253F6D1F008DF5C0 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		02D7B90A25406FDB008DF5C0 /* PhotoCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureDelegate.swift; sourceTree = "<group>"; };
 		02D7B9142540BBB5008DF5C0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		02D7B9172540E9F4008DF5C0 /* ScreenShot(10:21:20).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ScreenShot(10:21:20).png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 		02D7B8C3253F66CD008DF5C0 /* MyCameraApp */ = {
 			isa = PBXGroup;
 			children = (
+				02D7B9162540E9BB008DF5C0 /* PortfolioImages */,
 				02D7B8C4253F66CD008DF5C0 /* AppDelegate.swift */,
 				02D7B8C6253F66CD008DF5C0 /* SceneDelegate.swift */,
 				02D7B8C8253F66CD008DF5C0 /* ViewController.swift */,
@@ -70,6 +73,14 @@
 				02D7B8D2253F66D1008DF5C0 /* Info.plist */,
 			);
 			path = MyCameraApp;
+			sourceTree = "<group>";
+		};
+		02D7B9162540E9BB008DF5C0 /* PortfolioImages */ = {
+			isa = PBXGroup;
+			children = (
+				02D7B9172540E9F4008DF5C0 /* ScreenShot(10:21:20).png */,
+			);
+			path = PortfolioImages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -129,6 +140,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02D7B9182540E9F4008DF5C0 /* ScreenShot(10:21:20).png in Resources */,
 				02D7B8D1253F66D1008DF5C0 /* LaunchScreen.storyboard in Resources */,
 				02D7B8CE253F66D1008DF5C0 /* Assets.xcassets in Resources */,
 			);
