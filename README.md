@@ -13,7 +13,7 @@ Basic iOS camera app using UIKit and AVFoundation.
 - [ ] Add animations / improve ui design
 
 ## UI Showcase
-![UI as of 10/21/20](./MyCameraApp/PortfolioImages/ScreenShot(10:21:20).png)
+![UI as of 10/21/20](./MyCameraApp/PortfolioImages/ScreenShot(10:21:20).png = 250x)
 
 
 ## Sources
