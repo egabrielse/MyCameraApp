@@ -9,32 +9,45 @@ import UIKit
 import AVFoundation
 
 /*
- MARK: ViewController
+ MARK: ViewController (Class)
+    Interface to the Camera Controller and Image Viewer
  */
 class ViewController: UIViewController {
+    /// Interface to device's camera
     let cameraController = CameraController();
+    /// Array of taken photos (TODO? might be moved into the cameraController)
     var images: [UIImage] = [];
         
-    // MARK: viewDidLoad
+    // MARK: viewDidLoad (Func)
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .black;
+        
+        /// Add subviews to the view controller's view
         self.view.addSubview(self.captureButton);
         self.view.addSubview(self.imageView);
         self.view.addSubview(self.switchCameraButton);
         self.view.addSubview(self.toggleFlashButton);
 
+        /// Ready the cameraController for use by calling its prepare function
         cameraController.prepare {(error) in
             if let error = error {
+                /// If any errors occur during setup, they will be returned in the completion handler
                 print(error)
             } else {
+                /// If no errors occured, finish configuring the camera with the view controller:
+                /// 1) Display the camera preview onto the view controller's view
                 try? self.cameraController.displayPreview(on: self.view);
-                
-                let flashIcon = self.cameraController.getFlashMode();
-                self.toggleFlashButton.setImage(flashIcon, for: .normal);
+                /// 2) Get the current state of the cameraController's flash mode and assign a button icon depending on the result:
+                self.toggleFlashButton.setImage(self.cameraController.getFlashMode(), for: .normal);
+                /// 3) Assign targets to each button
+                self.captureButton.addTarget(self, action: #selector(self.capturePhoto), for: .touchUpInside);
+                self.switchCameraButton.addTarget(self, action: #selector(self.switchCamera), for: .touchUpInside);
+                self.toggleFlashButton.addTarget(self, action: #selector(self.toggleFlash), for: .touchUpInside);
             }
         }
 
+        /// Add layout constraints to subviews
         NSLayoutConstraint.activate([
             self.captureButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             self.captureButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -25),
@@ -49,7 +62,8 @@ class ViewController: UIViewController {
 
     
     /*
-     MARK: UI Components
+     MARK: captureButton (Object)
+        When tapped, calls the cameraController's capturePhoto method
      */
     let captureButton: UIButton = {
         let length: CGFloat = 75;
@@ -59,11 +73,15 @@ class ViewController: UIViewController {
         btn.heightAnchor.constraint(equalToConstant: length).isActive = true;
         btn.layer.cornerRadius = (length / 2.0);
         btn.backgroundColor = .white;
-        btn.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
         return btn;
     }()
     
-    
+    /*
+     MARK: imageView (Object)
+        Displays the most recent image taken by the camera.
+        TODO: When tapped, opens up an image picker from all images taken during the current camera
+              session can be viewed.
+     */
     let imageView: UIImageView = {
         let imgView = UIImageView();
         imgView.translatesAutoresizingMaskIntoConstraints = false;
@@ -78,6 +96,9 @@ class ViewController: UIViewController {
     }()
     
     
+    /*
+     MARK: switchCameraButton (Object)
+     */
     let switchCameraButton: UIButton = {
         let btn = UIButton();
         btn.translatesAutoresizingMaskIntoConstraints = false;
@@ -85,17 +106,19 @@ class ViewController: UIViewController {
         btn.heightAnchor.constraint(equalToConstant: 30).isActive = true;
         let btnImg = UIImage(named: "icons8-switch-camera-50");
         btn.setImage(btnImg, for: .normal)
-        btn.addTarget(self, action: #selector(switchCamera), for: .touchUpInside);
         return btn;
     }()
     
-    
+    /*
+     MARK: toggleFlashButton (Object)
+     */
     let toggleFlashButton: UIButton = {
         let btn = UIButton();
         btn.translatesAutoresizingMaskIntoConstraints = false;
         btn.widthAnchor.constraint(equalToConstant: 30).isActive = true;
         btn.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-        btn.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside);
+        /// Default button icon in case cameraController setup fails.
+        btn.setImage(UIImage(named: "icons8-flash-on-50"), for: .normal);
         return btn;
     }()
 }
@@ -103,34 +126,36 @@ class ViewController: UIViewController {
 
 
 
-/*
- MARK: UI Actions
- */
+// MARK: UI ACTIONS (Extension)
 extension ViewController {
-    
-    // MARK: capturePhoto
+
+    /*
+     MARK: capturePhoto
+        Calls the cameraController's capturePhoto method. Delegate is set to self.
+        TODO? if images object is moved into or abstracted into a new class, delegate will
+        have to be changed.
+     */
     @objc func capturePhoto() {
         cameraController.capturePhoto(delegate: self)
     }
     
-    // MARK: toggleFlash
+    /*
+     MARK: toggleFlash
+        Calls the cameraController's toggleFlashMode method, and
+        sets the toggleFlashButton's button icon to the returned UIImage value.
+     */
     @objc func toggleFlash() {
-        let flashIcon = cameraController.toggleFlashMode();
-        self.toggleFlashButton.setImage(flashIcon, for: .normal);
+        self.toggleFlashButton.setImage(cameraController.toggleFlashMode(), for: .normal);
     }
     
-    // MARK: switchCamera
+    /*
+     MARK: switchCamera
+        Calls the cameraController's switchCamera method.
+     */
     @objc func switchCamera() {
-        if cameraController.selectedCamera == CameraController.CameraSelection.front {
-            do {
-                try cameraController.switchCameraToRear();
-            } catch {
-                print(error);
-            }
-        } else {
-            do {
-                try cameraController.switchCameraToFront();
-            } catch {
+        cameraController.switchCamera { (error) in
+            if let error = error {
+                // TODO: Pop-up modal informing user of error.
                 print(error);
             }
         }
@@ -154,7 +179,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         
         guard let imageData = photo.fileDataRepresentation() else { return }
         let image = UIImage(data: imageData)!
-        if cameraController.selectedCamera == CameraController.CameraSelection.front {
+        if cameraController.getCameraSelection() == CameraController.CameraSelection.front {
             let flippedImage = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
             self.images.insert(flippedImage, at: 0);
             print("Photo from front facing camera captured.")
